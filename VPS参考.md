@@ -29,7 +29,7 @@
   - 本机 curl 下载速度测试： `curl -o /dev/null http://<domain>/500mb.bin`
 
 1. 网速测试：
-   curl -o /dev/null http://racknerd.yumecoder.top/500mb.bin 【19: 106k 】
+   curl -o /dev/null http://racknerd.yumecoder.top/500mb.bin 【19: 106k 0：2M 】【位置为 NY，开启bbr速度提升很大】
    curl -o /dev/null http://raksmart.yumecoder.top/500mb.bin 【11: 3.64M 12: 3.52M 14: 4.3M 20: 3.86M,4.25M 】
    curl -o /dev/null http://megalayer.yumecoder.top/500mb.bin 【11: 2.42M 12: 80k 14: 20k 20: 50k】
    curl -o /dev/null https://cloudcone.yumecoder.top/500mb.bin 【11: 80k 12: 30k】（进国内变慢了，ucloud 下载没问题）
