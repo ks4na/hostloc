@@ -2,7 +2,7 @@
 
 ## 登录
 
-随身 wifi 刷机后插入电脑，电脑配置 `NDIS` 后会自动连接以太网，查看 ip 后将最后一位改为 `1` (默认是 `10.42.0.1` ) 连接。
+随身 wifi 刷机后插入电脑，电脑正确配置 `RNDIS` （相关步骤见参考教程）后会自动连接以太网，查看 ip 后将最后一位改为 `1` (默认是 `10.42.0.1` ) 连接。
 
 ```sh
 # 使用 `root` 用户登录，密码为 1313144
@@ -88,10 +88,28 @@ echo host > /sys/kernel/debug/usb/ci_hdrc.0/role
 ## 安装软件
 
 - docker
-  - apt 源方式安装，其中命令中 `download.docker.com` 可以改为清华源后提高下载速度
+  - apt 源方式安装，可以把命令中 `https://download.docker.com/linux/debian` 换成 `https://mirrors.tuna.tsinghua.edu.cn/docker-ce/linux/debian` 后提高下载速度
   - 配置 `registry-mirrors`
-  - 修改存储路径
+  - 修改存储路径 `data-root` （`graph` 已废弃）
+
+## debian 系统下重刷
+
+### 重刷 debian
+
+ssh 登录 debian 系统后运行以下命令进入 fastboot 模式：
+
+```sh
+reboot bootloader
+```
+
+后续可以执行刷机脚本刷入新的 debian 系统。
+
+### 重刷 android
+
+进入 9008 模式后，使用 miko 刷入备份的 android 系统镜像文件。
 
 ## 参考
 
 - [酷安 - jsbsbxjxh66 - 410 随身 wifi 各个频率版&释放内存版&驱动全面](./assets/高通410刷debian/410随身wifi%20各个频率版&释放内存版&驱动全面%20来自%20jsbsbxjxh66%20-%20酷安.pdf)
+- [随身 WiFi 概要及护理手册](https://post.smzdm.com/p/avxoegdm/)
+- [HandsomeYingyan / OpenStick 项目](https://www.kancloud.cn/handsomehacker/openstick/2636505)
