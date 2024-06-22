@@ -31,11 +31,13 @@ nmcli conn delete wifi
 然后连接 wifi，并设置静态 ip：
 
 ```sh
-nmcli dev wifi connect <wifi名> password <密码>
+wifiname=<wifi_name>
 
-nmcli conn modify <wifi名> ipv4.method manual ipv4.address 192.168.1.99/24 ipv4.dns 192.168.1.1 ipv4.gateway 192.168.1.1
+nmcli dev wifi connect $wifiname password <密码>
 
-nmcli conn up <wifi名>
+nmcli conn modify $wifiname ipv4.method manual ipv4.address 192.168.1.99/24 ipv4.dns 192.168.1.1 ipv4.gateway 192.168.1.1
+
+nmcli conn up $wifiname
 ```
 
 > 如果有拓展坞，还需要修改 host 模式后，设置有线网。
@@ -75,7 +77,9 @@ dpkg-reconfigure --frontend=noninteractive locales
 locale
 ```
 
-## 开机切换为 host 模式
+## 开机脚本 /etc/rc.local
+
+### 切换为 host 模式
 
 向 `/etc/rc.local` 文件中 `exit 0` 之前加上这句：
 
@@ -84,6 +88,32 @@ echo host > /sys/kernel/debug/usb/ci_hdrc.0/role
 ```
 
 重启后确认已经改为 host 模式。
+
+### 重启 ModemManager
+
+默认情况下，即使基带没问题，启动之后 `mmcli -L` 还是提示 `No modems were found`，需要重启一下 `ModemManager`:
+
+```sh
+systemctl restart ModemManager
+```
+
+每次启动后都应该执行该命令，所以将以下命令写入 `/etc/rc.local`:
+
+```sh
+# 启动 30s 之后重启 ModemManager
+sleep 30
+systemctl restart ModemManager
+```
+
+## 挂载磁盘
+
+在 `/etc/fstab` 中添加即可，示例：
+
+```
+UUID=a1fce7ae-0204-4e7f-88a2-9da06a3e211f /mnt/aigo_u330_64g ext4 defaults,nofail 0 1
+```
+
+> 其中加上了 `nofail` 避免磁盘问题导致启动失败。
 
 ## 安装软件
 
