@@ -18,6 +18,14 @@ passwd
 userdel -r user
 ```
 
+## 修改 hostname
+
+```sh
+cat xxx > /etc/hostname
+```
+
+重启后确认生效。
+
 ## 设置静态 ip
 
 > 详细信息参考玩客云笔记
