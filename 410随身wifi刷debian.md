@@ -2,11 +2,11 @@
 
 ## 登录
 
-随身 wifi 刷机后插入电脑，电脑正确配置 `RNDIS` （相关步骤见参考教程）后会自动连接以太网，查看 ip 后将最后一位改为 `1` (默认是 `10.42.0.1` ) 连接。
+随身 wifi 刷机后插入电脑，电脑正确配置 `RNDIS` （相关步骤见参考教程）后会自动连接以太网，查看 ip 后将最后一位改为 `1` (默认是 `10.42.1.1` ) 连接。
 
 ```sh
 # 使用 `root` 用户登录，密码为 1313144
-ssh root@10.42.0.1
+ssh root@10.42.1.1
 ```
 
 登录后切换 `root` 用户：
@@ -21,7 +21,7 @@ userdel -r user
 ## 修改 hostname
 
 ```sh
-cat xxx > /etc/hostname
+echo xxx > /etc/hostname
 ```
 
 重启后确认生效。
@@ -50,13 +50,37 @@ nmcli conn up $wifiname
 
 > 如果有拓展坞，还需要修改 host 模式后，设置有线网。
 
-## 安装基础软件
+## 换源和安装基础软件
+
+更换为清华源：
+
+```sh
+cat <<EOF > /etc/apt/sources.list
+# 默认注释了源码镜像以提高 apt update 速度，如有需要可自行取消注释
+deb https://mirrors.tuna.tsinghua.edu.cn/debian/ bullseye main contrib non-free
+# deb-src https://mirrors.tuna.tsinghua.edu.cn/debian/ bullseye main contrib non-free
+
+deb https://mirrors.tuna.tsinghua.edu.cn/debian/ bullseye-updates main contrib non-free
+# deb-src https://mirrors.tuna.tsinghua.edu.cn/debian/ bullseye-updates main contrib non-free
+
+deb https://mirrors.tuna.tsinghua.edu.cn/debian/ bullseye-backports main contrib non-free
+# deb-src https://mirrors.tuna.tsinghua.edu.cn/debian/ bullseye-backports main contrib non-free
+
+# 以下安全更新软件源包含了官方源与镜像站配置，如有需要可自行修改注释切换
+deb https://mirrors.tuna.tsinghua.edu.cn/debian-security bullseye-security main contrib non-free
+# deb-src https://mirrors.tuna.tsinghua.edu.cn/debian-security bullseye-security main contrib non-free
+EOF
+```
 
 连接网络之后，先 `apt update`，然后安装以下软件：
 
 - vim
 - bash-completion
 - unzip
+
+```sh
+apt install vim bash-completion unzip -y
+```
 
 ## 时区调整
 
@@ -92,6 +116,7 @@ locale
 向 `/etc/rc.local` 文件中 `exit 0` 之前加上这句：
 
 ```sh
+# host 模式
 echo host > /sys/kernel/debug/usb/ci_hdrc.0/role
 ```
 
