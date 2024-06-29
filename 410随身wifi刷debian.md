@@ -77,6 +77,7 @@ EOF
 - vim
 - bash-completion
 - unzip
+- rsync
 
 ```sh
 apt install vim bash-completion unzip -y
