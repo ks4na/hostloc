@@ -1,5 +1,22 @@
 # 410 随身 wifi 刷 debian
 
+- [登录](#登录)
+- [修改 hostname](#修改-hostname)
+- [设置静态 ip](#设置静态-ip)
+- [换源和安装基础软件](#换源和安装基础软件)
+- [时区调整](#时区调整)
+- [默认语言调整](#默认语言调整)
+- [开机脚本 /etc/rc.local](#开机脚本-etcrclocal)
+  - [切换为 host 模式](#切换为-host-模式)
+  - [重启 ModemManager](#重启-modemmanager)
+- [挂载新分区](#挂载新分区)
+  - [涉及 docker 时的额外处理](#涉及-docker-时的额外处理)
+- [安装软件](#安装软件)
+- [debian 系统下重刷](#debian-系统下重刷)
+  - [重刷 debian](#重刷-debian)
+  - [重刷 android](#重刷-android)
+- [参考](#参考)
+
 ## 登录
 
 随身 wifi 刷机后插入电脑，电脑正确配置 `RNDIS` （相关步骤见参考教程）后会自动连接以太网，查看 ip 后将最后一位改为 `1` (默认是 `10.42.1.1` ) 连接。
@@ -139,15 +156,46 @@ sleep 30
 systemctl restart ModemManager
 ```
 
-## 挂载磁盘
+## 挂载新分区
 
 在 `/etc/fstab` 中添加即可，示例：
 
 ```
-UUID=a1fce7ae-0204-4e7f-88a2-9da06a3e211f /mnt/aigo_u330_64g ext4 defaults,nofail 0 1
+UUID=<uuid> <mount-point> ext4 defaults,nofail,errors=remount-ro 0 2
 ```
 
 > 其中加上了 `nofail` 避免磁盘问题导致启动失败。
+
+### 涉及 docker 时的额外处理
+
+如果挂载的分区存放了 docker 相关的内容（如 `data-root`，或者存在 docker 容器依赖的路径），那么为了避免开机时 docker 服务的启动早于该分区的挂载而导致 docker 容器启动失败，需要调整 systemd 中 docker 开机自启相关配置，等待分区挂载完成后再启动：
+
+```sh
+EDITOR=vim systemctl edit docker.service
+```
+
+然后打开的编辑器中顶部找到如下注释区域，在其内部添加以下内容（其中的挂载路径根据实际情况更改为指定的路径，例如上面挂载文件 `/etc/fstab` 中指定的挂载点为 `<mount-point>`）：
+
+```sh
+### Anything between here and the comment below will become the new contents of the file
+
+[Unit]
+RequiresMountsFor=/mnt/foo /mnt/bar
+
+### Lines below this comment will be discarded
+```
+
+保存并退出后，输入以下命令确认更改内容已经保存成功：
+
+```sh
+cat /etc/systemd/system/docker.service.d/override.conf
+```
+
+下次重启时， docker 就会等待指定的目录挂载完成后再启动了。
+
+> 问：如何移除本次更改？
+>
+> 答：使用 `rm /etc/systemd/system/docker.service.d/override.conf` 即可。
 
 ## 安装软件
 
